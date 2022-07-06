@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>간단한 Ajax 예제</title>
+<script type="text/javascript">
+var httpRequest = null;
+function getXMLHttpRequest(){
+	if(window.ActiveXObject){
+		try{
+			return new ActionXObject("Msxml2.XMLHTTP");
+		}catch(e){
+			try{
+				return new ActiveXObject("Microsoft.XMLHTTP");
+			}catch(e){
+				return null;
+			}
+		}
+	}else if(window.XMLHttpRequest){
+		return new XMLHttpRequest();
+	}else{
+		return null;
+	}
+}
+function load(url){
+	httpRequest = getXMLHttpRequest();
+	httpRequest.onreadystatechange = viewMessage;
+	httpRequest.open("GET", url, true);
+	httpRequest.send(null);
+}
+function viewMessage(){
+	if(httpRequest.readyState == 4){
+		if(httpRequest.status == 200){
+			alert(httpRequest.responseText);
+		}else{
+			alert("실패: "+httpRequest.status);
+		}
+	}
+}
+</script>
+</head>
+<body>
+<input type="button" value="simple.txt" onclick="load('simple.txt')"/>
+<input type="button" value="simple2.txt" onclick="load('simple2.txt')"/>
+<input type="button" value="simple.jsp" onclick="load('simple.jsp')"/>
+<input type="button" value="simple2.jsp" onclick="load('simple2.jsp')"/>
+</body>
+</html>
