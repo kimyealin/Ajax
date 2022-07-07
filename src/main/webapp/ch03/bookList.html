@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>책 목록</title>
+<script type="text/javascript" src="httpRequest.js"></script>
+<script type="text/javascript">
+var xmlDoc = null; //서버에서 읽어온 XML문서 저장
+var xslDoc = null; //서버에서 읽어온 XSL문서 저장
+function loadBooks(){
+	sendRequest("books.jsp", null, loadedBooksXML, "GET");
+}
+function loadedBooksXML(){
+	if(httpRequest.readyState == 4){
+		if(httpRequest.status == 200){
+			xmlDoc = httpRequest.responseXML;
+			sendRequest("books.xsl", null, loadedBooksXSL, "GET");
+		}//XML로 읽은 뒤 XSL 문서 로딩
+	}
+}
+function loadedBooksXSL(){
+	if(httpRequest.readyState == 4){
+		if(httpRequest.status == 200){
+			xslDoc = httpRequest.responseXML;
+			doXSLT(); //XSL읽은 뒤 변환 실행
+		}
+	}
+}
+function doXSLT(){
+	if(xmlDoc == null || xslDoc == null) return;
+	var bookList = document.getElementById("bookList");
+	if(window.ActiveXObject){ //IE인 경우 변환처리
+		bookList.innerHTML = xmlDoc.transformNode(xslDoc);
+	}else{ //기타 브라우저의 경우 변환처리
+		var xsltProc = new XSLTProcessor();
+		xsltProc.importStylesheet(xslDoc);
+		var fragment = xsltProc.transformToFragment(xmlDoc, document);
+		bookList.appendChild(fragment);
+	}
+}
+window.onload = function(){
+	loadBooks();
+}
+</script>
+</head>
+<body>
+	<h1>신규 책 목록</h1>
+	<div id="bookList"></div>
+</body>
+</html>
